@@ -1,5 +1,3 @@
-import { Quiz } from "./Componets/Quiz";
-import "bootstrap/dist/css/bootstrap.min.css";
 import { QuizArea } from "./Pages/LogIn";
 import { Landing } from "./Pages/Landing";
 import { Routes, Route } from "react-router-dom";

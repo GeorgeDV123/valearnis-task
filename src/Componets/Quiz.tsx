@@ -6,12 +6,15 @@ export function Quiz() {
   const [showResults, setShowResults] = useState(false);
   const [index, setIndex] = useState(0);
   const [score, setScore] = useState(0);
-  const [complete, setComplete] = useState(1);
 
   // API request for trivia questions
   const [questions, setQuestions] = useState([]);
   const [answer, setAnswer] = useState([]);
-  const [incorrect, setIncorrect] = useState([]);
+  const [incorrect1, setIncorrect1] = useState([]);
+  const [incorrect2, setIncorrect2] = useState([]);
+  const [incorrect3, setIncorrect3] = useState([]);
+  const [incorrect4, setIncorrect4] = useState([]);
+  const [incorrect5, setIncorrect5] = useState([]);
 
   function handleErrors(response: any) {
     if (!response.ok) {
@@ -19,16 +22,16 @@ export function Quiz() {
     }
     return response;
   }
-  const fetchUserData = () => {
+  const fetchQuestions = () => {
     fetch(
-      "https://the-trivia-api.com/api/questions?categories=food_and_drink&limit=5&difficulty=medium"
+      "https://the-trivia-api.com/api/questions?limit=6&difficulty=medium&tags=mythology"
     )
       .then(handleErrors)
       .catch((error) =>
         window.prompt(error.message, "Cannot get trivia questions :(")
       )
-      .then(async (response) => {
-        return await response.json();
+      .then((response) => {
+        return response.json();
       })
       .then((data) => {
         const text = data.map((obj: { question: string }) => obj.question);
@@ -38,70 +41,73 @@ export function Quiz() {
         const incorrect = data.map(
           (obj: { incorrectAnswers: string }) => obj.incorrectAnswers
         );
-
         setQuestions(text);
         setAnswer(correct);
-        setIncorrect(incorrect);
+        setIncorrect1(incorrect[0]);
+        setIncorrect2(incorrect[1]);
+        setIncorrect3(incorrect[2]);
+        setIncorrect4(incorrect[3]);
+        setIncorrect5(incorrect[4]);
       });
+    return;
   };
 
-  //use await here I think
-
   useEffect(() => {
-    fetchUserData();
+    fetchQuestions();
   }, []);
 
+  // Array of random questions
   const questions1 = [
     {
       text: questions[0],
       options: [
-        { id: 0, text: incorrect[0], isCorrect: false },
-        { id: 1, text: incorrect[0], isCorrect: false },
-        { id: 2, text: incorrect[0], isCorrect: false },
+        { id: 0, text: incorrect1[0], isCorrect: false },
+        { id: 1, text: incorrect1[1], isCorrect: false },
+        { id: 2, text: incorrect1[2], isCorrect: false },
         { id: 3, text: answer[0], isCorrect: true },
       ],
     },
     {
       text: questions[1],
       options: [
-        { id: 0, text: incorrect[1], isCorrect: false },
+        { id: 0, text: incorrect2[0], isCorrect: false },
         { id: 3, text: answer[1], isCorrect: true },
-        { id: 2, text: incorrect[1], isCorrect: false },
-        { id: 1, text: incorrect[1], isCorrect: false },
+        { id: 2, text: incorrect2[1], isCorrect: false },
+        { id: 1, text: incorrect2[2], isCorrect: false },
       ],
     },
     {
       text: questions[2],
       options: [
         { id: 3, text: answer[2], isCorrect: true },
-        { id: 1, text: incorrect[2], isCorrect: false },
-        { id: 2, text: incorrect[2], isCorrect: false },
-        { id: 0, text: incorrect[2], isCorrect: false },
+        { id: 1, text: incorrect3[0], isCorrect: false },
+        { id: 2, text: incorrect3[1], isCorrect: false },
+        { id: 0, text: incorrect3[2], isCorrect: false },
       ],
     },
     {
       text: questions[3],
       options: [
-        { id: 0, text: incorrect[3], isCorrect: false },
-        { id: 1, text: incorrect[3], isCorrect: false },
-        { id: 2, text: incorrect[3], isCorrect: false },
+        { id: 0, text: incorrect4[0], isCorrect: false },
+        { id: 1, text: incorrect4[1], isCorrect: false },
+        { id: 2, text: incorrect4[2], isCorrect: false },
         { id: 3, text: answer[3], isCorrect: true },
       ],
     },
     {
       text: questions[4],
       options: [
-        { id: 0, text: incorrect[4], isCorrect: false },
-        { id: 1, text: incorrect[4], isCorrect: false },
+        { id: 0, text: incorrect5[0], isCorrect: false },
+        { id: 1, text: incorrect5[1], isCorrect: false },
         { id: 3, text: answer[4], isCorrect: true },
-        { id: 2, text: incorrect[4], isCorrect: false },
+        { id: 2, text: incorrect5[2], isCorrect: false },
       ],
     },
   ];
 
-  /* A possible answer was clicked */
+  // User clicks on option
   const optionClicked = (isCorrect: boolean) => {
-    // Increment the score
+    // If correct, +1 score
     if (isCorrect) {
       setScore(score + 1);
     }
@@ -112,14 +118,26 @@ export function Quiz() {
     }
   };
 
-  /* Resets the game back to default */
+  // Reset the game
   const restartGame = () => {
     setScore(0);
     setIndex(0);
     setShowResults(false);
   };
 
-  const btn = document.getElementById("btn1");
+  // Return to previous question
+  const goBack = () => {
+    if (score <= 0) {
+      setScore(0);
+      setIndex(index - 1);
+      return;
+    }
+    setIndex(index - 1);
+    setScore(score - 1);
+  };
+
+  // Depending on the score, show / hide the button
+  const btn = document.getElementById("back-btn");
   if (index > 0) {
     if (btn) {
       btn.style.display = "block";
@@ -130,47 +148,61 @@ export function Quiz() {
       btn.style.display = "none";
     }
   }
+  if (index > 4) {
+    if (btn) {
+      btn.style.display = "none";
+    }
+  }
 
   return (
-    <div className="App">
-      <h1>USA Quiz 🇺🇸</h1>
-      <h2>Score: {score}</h2>
-
-      {showResults ? (
-        <div className="final-results">
-          <h1>Final Results</h1>
-          <h2>
-            {score} out of {questions1.length} correct - (
-            {(score / questions1.length) * 100}%)
-          </h2>
-          <button onClick={() => restartGame()}>Restart game</button>
+    <>
+      {/* Final Results */}
+      <section className="quiz-main">
+        <div className="quiz-area">
+          {showResults ? (
+            <div className="results">
+              <h2 style={{ marginTop: "2rem" }}>Final Results</h2>
+              <h2>
+                {score} out of {questions1.length} correct - (
+                {(score / questions1.length) * 100}%)
+              </h2>
+              <span className="finish-btns">
+                <button className="restart" onClick={() => restartGame()}>
+                  Restart game
+                </button>
+                <button className="sign-out" onClick={() => auth.signOut()}>
+                  Sign Out
+                </button>
+              </span>
+            </div>
+          ) : (
+            <div className="questions">
+              {/* Quiz Questions */}
+              <h2>Mythology Quiz</h2>
+              <h2 style={{ marginBottom: "2rem" }}>Score: {score}</h2>
+              <h3>
+                Question: {index + 1} out of {questions1.length}
+              </h3>
+              <h3 className="question-text">{questions1[index].text}</h3>
+              <ul>
+                {questions1[index].options.map((option) => {
+                  return (
+                    <li
+                      key={option.id}
+                      onClick={() => optionClicked(option.isCorrect)}
+                    >
+                      {option.text}
+                    </li>
+                  );
+                })}
+              </ul>
+              <button id="back-btn" onClick={goBack}>
+                ← Back
+              </button>
+            </div>
+          )}
         </div>
-      ) : (
-        <div className="question-card">
-          <h2>
-            Question: {index + 1} out of {questions1.length}
-          </h2>
-          <h3 className="question-text">{questions1[index].text}</h3>
-          <ul>
-            {questions1[index].options.map((option) => {
-              return (
-                <li
-                  key={option.id}
-                  onClick={() => optionClicked(option.isCorrect)}
-                >
-                  {option.text}
-                </li>
-              );
-            })}
-          </ul>
-        </div>
-      )}
-      <button id="btn1" onClick={() => setIndex(index - 1)}>
-        back
-      </button>
-      <button className="sign-out" onClick={() => auth.signOut()}>
-        Sign Out
-      </button>
-    </div>
+      </section>
+    </>
   );
 }

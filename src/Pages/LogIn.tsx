@@ -3,25 +3,38 @@ import { auth } from "../Componets/Firebase";
 import { useAuthState } from "react-firebase-hooks/auth";
 import { Landing } from "./Landing";
 import { Quiz } from "../Componets/Quiz";
-
+import { googleSignIn, githubSignIn } from "../Componets/Firebase";
 
 export function QuizArea() {
   const [user] = useAuthState(auth);
-  return <>{user ? <Quiz /> : <LogIn />}</>;
+  return (
+    //Show Login or Quiz, depending on Auth state
+    <>
+      <main className="quiz-login-area">{user ? <Quiz /> : <LogIn />}</main>
+    </>
+  );
 }
 
-export function LogIn() {
+//Login section
+function LogIn() {
+  const [user] = useAuthState(auth);
   return (
     <>
-      <section>
-        <h1>Quiz App</h1>
+      <section className="login-area">
         <div>
-          <button>Log in with Google</button>
-          <button>Log in with Phone Number</button>
-          <button onClick={() => signInAnonymously(auth)}>
-            Sign in as Guest
+          <h2>Please log in to continue</h2>
+          <button className="button1" onClick={googleSignIn}>Log in with Google</button>
+          <button className="button3" onClick={githubSignIn}>Log in with Github</button>
+          <button className="button2" onClick={() => signInAnonymously(auth)}>
+            Log in as Guest
+          </button>
+          <button
+            onClick={() => (window.location.href = "/")}
+          >
+            ← Go back
           </button>
         </div>
+        <img src="/imgs/min.png"></img>
       </section>
     </>
   );
